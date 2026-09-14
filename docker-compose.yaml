@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  libreoffice-converter:
+    image: libreoffice-converter:alpine
+    container_name: libreoffice-converter
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - libreoffice_input:/data/input
+      - libreoffice_output:/data/output
+    environment:
+      - TZ=Europe/Berlin
+    command: sh -c "sleep infinity"
+
+volumes:
+  libreoffice_input:
+  libreoffice_output:
