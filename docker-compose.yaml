@@ -2,18 +2,22 @@ version: "3.8"
 
 services:
   libreoffice-converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: libreoffice-converter:alpine
     container_name: libreoffice-converter
     restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      - TZ=Europe/Berlin
     volumes:
       - libreoffice_input:/data/input
       - libreoffice_output:/data/output
-    environment:
-      - TZ=Europe/Berlin
-    command: sh -c "sleep infinity"
+      - libreoffice_processed:/data/processed
 
 volumes:
   libreoffice_input:
   libreoffice_output:
+  libreoffice_processed:
