@@ -12,4 +12,4 @@ WORKDIR /app
 
 COPY app.py /app/app.py
 
-CMD ["sh", "-c", "mkdir -p /data/input /data/output && chmod -R 777 /data/input /data/output && python3 /app/app.py"]
+CMD ["sh", "-c", "mkdir -p /data/input /data/output /data/processed && chmod -R 777 /data/input /data/output /data/processed && python3 /app/app.py"]
