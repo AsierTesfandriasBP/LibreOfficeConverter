@@ -6,9 +6,7 @@ RUN apk update && apk add --no-cache \
     ttf-dejavu \
     bash \
     python3 \
-    py3-pip
-
-RUN pip3 install flask
+    py3-flask
 
 WORKDIR /app
 
