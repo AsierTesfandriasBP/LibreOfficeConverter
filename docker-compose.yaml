@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: libreoffice-converter:alpine
     container_name: libreoffice-converter
     restart: unless-stopped
     ports:
@@ -16,6 +15,8 @@ services:
       - libreoffice_input:/data/input
       - libreoffice_output:/data/output
       - libreoffice_processed:/data/processed
+    networks:
+      - n8n_shared
 
 volumes:
   libreoffice_input:
