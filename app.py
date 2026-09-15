@@ -199,7 +199,7 @@ def convert_and_read():
 
 @app.route('/upload-convert-read', methods=['POST', 'GET'])
 def upload_convert_read():
-    #try:
+    try:
         if request.method == 'GET':
             return jsonify({
                 "success": True,
@@ -207,13 +207,6 @@ def upload_convert_read():
             })
         else:
             print("Received request for upload-convert-read")
-            return jsonify({
-                            "success": True,
-                            "message": "POST."
-                        })
-            
-            
-            """
             print("request.content_type:", request.content_type)
             print("request.files keys:", list(request.files.keys()))
             print("request.form keys:", list(request.form.keys()))
@@ -355,7 +348,7 @@ def upload_convert_read():
             "unexpected top-level error in upload-convert-read",
             500,
             details=str(e)
-        )"""
+        )
 
 
 if __name__ == '__main__':
