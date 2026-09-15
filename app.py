@@ -201,6 +201,9 @@ def convert_and_read():
 def upload_convert_read():
     try:
         print("Received request for upload-convert-read")
+        print("request.content_type:", request.content_type)
+        print("request.files keys:", list(request.files.keys()))
+        print("request.form keys:", list(request.form.keys()))
         uploaded_file = request.files.get("file")
         print("File upload received")
         override_filename = request.form.get("filename")
