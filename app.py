@@ -15,7 +15,7 @@ os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({"status": "ok"})
+    return jsonify({"status": "ok test"})
 
 @app.route('/convert', methods=['POST'])
 def convert():
