@@ -206,12 +206,14 @@ def upload_convert_read():
                 "message": "This endpoint accepts POST requests with a file upload."
             })
         else:
+            print("Received request for upload-convert-read")
             return jsonify({
                             "success": True,
-                            "message": "This endpoint accepts POST requests with a file upload."
+                            "message": "POST."
                         })
+            
+            
             """
-            print("Received request for upload-convert-read")
             print("request.content_type:", request.content_type)
             print("request.files keys:", list(request.files.keys()))
             print("request.form keys:", list(request.form.keys()))
