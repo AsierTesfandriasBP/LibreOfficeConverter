@@ -197,145 +197,152 @@ def convert_and_read():
         )
 
 
-@app.route('/upload-convert-read', methods=['POST'])
-def upload_convert_read(file, filename=None, move_processed="true", encoding="utf-8"):
+@app.route('/upload-convert-read', methods=['POST', 'GET'])
+def upload_convert_read():
     try:
-        print("Received request for upload-convert-read")
-        print("request.content_type:", request.content_type)
-        print("request.files keys:", list(request.files.keys()))
-        print("request.form keys:", list(request.form.keys()))
-        uploaded_file = request.files.get("file")
-        print("File upload received")
-        override_filename = request.form.get("filename")
-        print("Filename override received")
-        move_processed_raw = request.form.get("move_processed", "true")
-        print("Move processed received")
-        encoding = request.form.get("encoding", "utf-8")
-        print("Encoding received")
-
-        move_processed = str(move_processed_raw).lower() in ["true", "1", "yes", "on"]
-
-        if uploaded_file is None:
-            return json_error("missing uploaded file in form-data field 'file'", 400)
-        print("Uploaded file exists")
+        if request.method == 'GET':
+            return jsonify({
+                "success": True,
+                "message": "This endpoint accepts POST requests with a file upload."
+            })
+        else:
         
-        original_filename = uploaded_file.filename
-        if not original_filename and not override_filename:
-            return json_error("uploaded file has no filename and no override filename was provided", 400)
-        print("Original filename set")
-        
-        try:
-            safe_filename = build_safe_filename(
-                original_filename=original_filename,
-                override_filename=override_filename
-            )
-        except ValueError as e:
-            return json_error(str(e), 400, original_filename=original_filename, override_filename=override_filename)
+            print("Received request for upload-convert-read")
+            print("request.content_type:", request.content_type)
+            print("request.files keys:", list(request.files.keys()))
+            print("request.form keys:", list(request.form.keys()))
+            uploaded_file = request.files.get("file")
+            print("File upload received")
+            override_filename = request.form.get("filename")
+            print("Filename override received")
+            move_processed_raw = request.form.get("move_processed", "true")
+            print("Move processed received")
+            encoding = request.form.get("encoding", "utf-8")
+            print("Encoding received")
 
-        input_file = os.path.join(INPUT_DIR, safe_filename)
-        name_without_ext = os.path.splitext(safe_filename)[0]
-        output_file = os.path.join(OUTPUT_DIR, f"{name_without_ext}.txt")
-        processed_file = os.path.join(PROCESSED_DIR, safe_filename)
+            move_processed = str(move_processed_raw).lower() in ["true", "1", "yes", "on"]
 
-        # Alte Dateien mit gleichem Namen bereinigen
-        for path in [input_file, output_file]:
-            if os.path.exists(path):
-                os.remove(path)
-
-        # Upload speichern
-        try:
-            uploaded_file.save(input_file)
-        except Exception as e:
-            return json_error(
-                "failed to save uploaded file",
-                500,
-                input_file=input_file,
-                details=str(e)
-            )
-
-        if not os.path.isfile(input_file):
-            return json_error(
-                "uploaded file was not saved correctly",
-                500,
-                input_file=input_file
-            )
-
-        print("Uploaded file saved successfully")
-        print("Converting file...")
-        # Konvertieren
-        try:
-            result = convert_with_libreoffice(input_file, OUTPUT_DIR)
-        except subprocess.CalledProcessError as e:
-            return json_error(
-                "conversion failed",
-                500,
-                input_file=input_file,
-                stdout=e.stdout,
-                stderr=e.stderr
-            )
-        except Exception as e:
-            return json_error(
-                "unexpected error during libreoffice conversion",
-                500,
-                input_file=input_file,
-                details=str(e)
-            )
-
-        if not os.path.isfile(output_file):
-            return json_error(
-                "output file was not created",
-                500,
-                input_file=input_file,
-                output_file=output_file,
-                stdout=result.stdout,
-                stderr=result.stderr
-            )
-
-        print("File converted successfully")
-        # Text lesen
-        try:
-            with open(output_file, "r", encoding=encoding, errors="replace") as f:
-                text_content = f.read()
-        except Exception as e:
-            return json_error(
-                "failed to read converted text file",
-                500,
-                input_file=input_file,
-                output_file=output_file,
-                details=str(e)
-            )
-
-        print("Text read successfully")
-        # Originaldatei verschieben
-        final_processed_file = None
-        if move_processed:
+            if uploaded_file is None:
+                return json_error("missing uploaded file in form-data field 'file'", 400)
+            print("Uploaded file exists")
+            
+            original_filename = uploaded_file.filename
+            if not original_filename and not override_filename:
+                return json_error("uploaded file has no filename and no override filename was provided", 400)
+            print("Original filename set")
+            
             try:
-                if os.path.exists(processed_file):
-                    os.remove(processed_file)
-                shutil.move(input_file, processed_file)
-                final_processed_file = processed_file
+                safe_filename = build_safe_filename(
+                    original_filename=original_filename,
+                    override_filename=override_filename
+                )
+            except ValueError as e:
+                return json_error(str(e), 400, original_filename=original_filename, override_filename=override_filename)
+
+            input_file = os.path.join(INPUT_DIR, safe_filename)
+            name_without_ext = os.path.splitext(safe_filename)[0]
+            output_file = os.path.join(OUTPUT_DIR, f"{name_without_ext}.txt")
+            processed_file = os.path.join(PROCESSED_DIR, safe_filename)
+
+            # Alte Dateien mit gleichem Namen bereinigen
+            for path in [input_file, output_file]:
+                if os.path.exists(path):
+                    os.remove(path)
+
+            # Upload speichern
+            try:
+                uploaded_file.save(input_file)
             except Exception as e:
                 return json_error(
-                    "file was converted, but moving to processed failed",
+                    "failed to save uploaded file",
+                    500,
+                    input_file=input_file,
+                    details=str(e)
+                )
+
+            if not os.path.isfile(input_file):
+                return json_error(
+                    "uploaded file was not saved correctly",
+                    500,
+                    input_file=input_file
+                )
+
+            print("Uploaded file saved successfully")
+            print("Converting file...")
+            # Konvertieren
+            try:
+                result = convert_with_libreoffice(input_file, OUTPUT_DIR)
+            except subprocess.CalledProcessError as e:
+                return json_error(
+                    "conversion failed",
+                    500,
+                    input_file=input_file,
+                    stdout=e.stdout,
+                    stderr=e.stderr
+                )
+            except Exception as e:
+                return json_error(
+                    "unexpected error during libreoffice conversion",
+                    500,
+                    input_file=input_file,
+                    details=str(e)
+                )
+
+            if not os.path.isfile(output_file):
+                return json_error(
+                    "output file was not created",
                     500,
                     input_file=input_file,
                     output_file=output_file,
-                    text=text_content,
+                    stdout=result.stdout,
+                    stderr=result.stderr
+                )
+
+            print("File converted successfully")
+            # Text lesen
+            try:
+                with open(output_file, "r", encoding=encoding, errors="replace") as f:
+                    text_content = f.read()
+            except Exception as e:
+                return json_error(
+                    "failed to read converted text file",
+                    500,
+                    input_file=input_file,
+                    output_file=output_file,
                     details=str(e)
                 )
-        print("File moved to processed successfully")
-        return jsonify({
-            "success": True,
-            "message": "file uploaded, converted and read successfully",
-            "original_filename": original_filename,
-            "stored_filename": safe_filename,
-            "input_file": input_file,
-            "output_file": output_file,
-            "processed_file": final_processed_file,
-            "text": text_content,
-            "stdout": result.stdout,
-            "stderr": result.stderr
-        })
+
+            print("Text read successfully")
+            # Originaldatei verschieben
+            final_processed_file = None
+            if move_processed:
+                try:
+                    if os.path.exists(processed_file):
+                        os.remove(processed_file)
+                    shutil.move(input_file, processed_file)
+                    final_processed_file = processed_file
+                except Exception as e:
+                    return json_error(
+                        "file was converted, but moving to processed failed",
+                        500,
+                        input_file=input_file,
+                        output_file=output_file,
+                        text=text_content,
+                        details=str(e)
+                    )
+            print("File moved to processed successfully")
+            return jsonify({
+                "success": True,
+                "message": "file uploaded, converted and read successfully",
+                "original_filename": original_filename,
+                "stored_filename": safe_filename,
+                "input_file": input_file,
+                "output_file": output_file,
+                "processed_file": final_processed_file,
+                "text": text_content,
+                "stdout": result.stdout,
+                "stderr": result.stderr
+            })
 
     except Exception as e:
         return json_error(
