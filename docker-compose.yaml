@@ -17,6 +17,7 @@ services:
       - libreoffice_processed:/data/processed
     networks:
       - n8n_shared
+      - default
 
 volumes:
   libreoffice_input:
