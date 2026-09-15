@@ -200,6 +200,7 @@ def convert_and_read():
 @app.route('/upload-convert-read', methods=['POST'])
 def upload_convert_read():
     try:
+        print("Received request for upload-convert-read")
         uploaded_file = request.files.get("file")
         print("File upload received")
         override_filename = request.form.get("filename")
