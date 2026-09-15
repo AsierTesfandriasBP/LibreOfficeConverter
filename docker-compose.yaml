@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      images: libreoffice-converter:alpine
+      images: libreoffice-converter:latest
     container_name: libreoffice-converter
     restart: unless-stopped
     ports:
