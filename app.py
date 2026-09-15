@@ -198,7 +198,7 @@ def convert_and_read():
 
 
 @app.route('/upload-convert-read', methods=['POST'])
-def upload_convert_read():
+def upload_convert_read(file, filename=None, move_processed="true", encoding="utf-8"):
     try:
         print("Received request for upload-convert-read")
         print("request.content_type:", request.content_type)
