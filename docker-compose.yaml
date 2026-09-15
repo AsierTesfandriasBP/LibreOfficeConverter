@@ -21,8 +21,3 @@ volumes:
   libreoffice_input:
   libreoffice_output:
   libreoffice_processed:
-
-networks:
-  n8n_shared:
-    external: true
-    name: n8n-dev-network
