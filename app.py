@@ -201,19 +201,25 @@ def convert_and_read():
 def upload_convert_read():
     try:
         uploaded_file = request.files.get("file")
+        print("File upload received")
         override_filename = request.form.get("filename")
+        print("Filename override received")
         move_processed_raw = request.form.get("move_processed", "true")
+        print("Move processed received")
         encoding = request.form.get("encoding", "utf-8")
+        print("Encoding received")
 
         move_processed = str(move_processed_raw).lower() in ["true", "1", "yes", "on"]
 
         if uploaded_file is None:
             return json_error("missing uploaded file in form-data field 'file'", 400)
-
+        print("Uploaded file exists")
+        
         original_filename = uploaded_file.filename
         if not original_filename and not override_filename:
             return json_error("uploaded file has no filename and no override filename was provided", 400)
-
+        print("Original filename set")
+        
         try:
             safe_filename = build_safe_filename(
                 original_filename=original_filename,
@@ -250,6 +256,8 @@ def upload_convert_read():
                 input_file=input_file
             )
 
+        print("Uploaded file saved successfully")
+        print("Converting file...")
         # Konvertieren
         try:
             result = convert_with_libreoffice(input_file, OUTPUT_DIR)
@@ -279,6 +287,7 @@ def upload_convert_read():
                 stderr=result.stderr
             )
 
+        print("File converted successfully")
         # Text lesen
         try:
             with open(output_file, "r", encoding=encoding, errors="replace") as f:
@@ -292,6 +301,7 @@ def upload_convert_read():
                 details=str(e)
             )
 
+        print("Text read successfully")
         # Originaldatei verschieben
         final_processed_file = None
         if move_processed:
@@ -309,7 +319,7 @@ def upload_convert_read():
                     text=text_content,
                     details=str(e)
                 )
-
+        print("File moved to processed successfully")
         return jsonify({
             "success": True,
             "message": "file uploaded, converted and read successfully",
