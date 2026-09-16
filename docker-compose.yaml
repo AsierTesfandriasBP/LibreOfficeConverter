@@ -12,13 +12,13 @@ services:
     environment:
       - TZ=Europe/Berlin
     volumes:
-      - libreoffice_convert_data:/data/convert
+      - libreoffice_data:/data/convert
     networks:
       - n8n_shared
       - default
 
 volumes:
-  libreoffice_convert_data:
+  libreoffice_data:
 
 networks:
   n8n_shared:
