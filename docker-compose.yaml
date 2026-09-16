@@ -12,17 +12,13 @@ services:
     environment:
       - TZ=Europe/Berlin
     volumes:
-      - libreoffice_input:/data/input
-      - libreoffice_output:/data/output
-      - libreoffice_processed:/data/processed
+      - libreoffice_convert_data:/data/convert
     networks:
       - n8n_shared
       - default
 
 volumes:
-  libreoffice_input:
-  libreoffice_output:
-  libreoffice_processed:
+  libreoffice_convert_data:
 
 networks:
   n8n_shared:

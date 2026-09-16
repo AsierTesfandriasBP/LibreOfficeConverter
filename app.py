@@ -7,9 +7,9 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-INPUT_DIR = "/data/input"
-OUTPUT_DIR = "/data/output"
-PROCESSED_DIR = "/data/processed"
+INPUT_DIR = "/data/convert/input"
+OUTPUT_DIR = "/data/convert/output"
+PROCESSED_DIR = "/data/convert/processed"
 ALLOWED_EXTENSIONS = {".doc", ".docx"}
 
 os.makedirs(INPUT_DIR, exist_ok=True)
