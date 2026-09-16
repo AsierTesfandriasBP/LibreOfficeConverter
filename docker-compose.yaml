@@ -14,6 +14,7 @@ services:
     volumes:
       - libreoffice_data:/data/convert
     networks:
+      - n8n_shared_dev
       - n8n_shared
       - default
 
@@ -21,6 +22,9 @@ volumes:
   libreoffice_data:
 
 networks:
-  n8n_shared:
+  n8n_shared_dev:
     external: true
     name: n8n-dev-network
+  n8n_shared:
+    external: true
+    name: n8n-network
