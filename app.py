@@ -9,12 +9,10 @@ app = Flask(__name__)
 
 INPUT_DIR = "/data/convert/input"
 OUTPUT_DIR = "/data/convert/output"
-PROCESSED_DIR = "/data/convert/processed"
 ALLOWED_EXTENSIONS = {".doc", ".docx"}
 
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 
 # Return a JSON error response with a given message and status code
@@ -81,10 +79,7 @@ def upload_convert_read():
         print("------------------------------------------------", flush=True)
         uploaded_file = request.files.get("file")
         override_filename = request.form.get("filename")
-        move_processed_raw = request.form.get("move_processed", "true")
         encoding = request.form.get("encoding", "utf-8")
-
-        move_processed = str(move_processed_raw).lower() in ["true", "1", "yes", "on"]
 
         if uploaded_file is None:
             return json_error("missing uploaded file in form-data field 'file'", 400)
@@ -106,7 +101,6 @@ def upload_convert_read():
         input_file = os.path.join(INPUT_DIR, safe_filename)
         name_without_ext = os.path.splitext(safe_filename)[0]
         output_file = os.path.join(OUTPUT_DIR, f"{name_without_ext}.txt")
-        processed_file = os.path.join(PROCESSED_DIR, safe_filename)
 
         # Cleanup any existing files with the same name before processing
         for path in [input_file, output_file]:
@@ -124,6 +118,7 @@ def upload_convert_read():
                 details=str(e)
             )
 
+        # Check if the uploaded file was saved correctly
         if not os.path.isfile(input_file):
             return json_error(
                 "uploaded file was not saved correctly",
@@ -151,7 +146,8 @@ def upload_convert_read():
                 input_file=input_file,
                 details=str(e)
             )
-
+            
+        # Check if the output file was created
         if not os.path.isfile(output_file):
             return json_error(
                 "output file was not created",
@@ -163,7 +159,8 @@ def upload_convert_read():
             )
 
         print("Word file converted successfully", flush=True)
-        # Text lesen
+        
+        # read the converted text file
         try:
             with open(output_file, "r", encoding=encoding, errors="replace") as f:
                 text_content = f.read()
@@ -177,27 +174,10 @@ def upload_convert_read():
             )
 
         print("Text read successfully", flush=True)
-        # Originaldatei verschieben
-        final_processed_file = None
-        if move_processed:
-            try:
-                if os.path.exists(processed_file):
-                    os.remove(processed_file)
-                shutil.move(input_file, processed_file)
-                final_processed_file = processed_file
-            except Exception as e:
-                return json_error(
-                    "Word file was converted, but moving to processed failed",
-                    500,
-                    input_file=input_file,
-                    output_file=output_file,
-                    text=text_content,
-                    details=str(e)
-                )
-        print("File moved to processed successfully", flush=True)
         
         # Cleanup the txt file
         try:
+            os.remove(input_file)
             os.remove(output_file)
         except Exception as e:
             return json_error(
@@ -216,7 +196,6 @@ def upload_convert_read():
             "stored_filename": safe_filename,
             "input_file": input_file,
             "output_file": output_file,
-            "processed_file": final_processed_file,
             "text": text_content,
             "stdout": result.stdout,
             "stderr": result.stderr
